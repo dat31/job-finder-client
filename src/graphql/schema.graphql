@@ -1,0 +1,232 @@
+# Exposes a URL that specifies the behaviour of this scalar.
+directive @specifiedBy(
+    # The URL that specifies the behaviour of this scalar.
+    url: String!
+) on SCALAR
+type Company {
+    id: Float!
+    createdAt: String!
+    updatedAt: String!
+    name: String!
+    location: String!
+    industry: String!
+    jobs: Job
+    reviews: CompanyReview
+}
+
+input CompanyInput {
+    name: String!
+    industry: String!
+    location: String!
+}
+
+type CompanyResponse {
+    items: [Company!]!
+    total: Int!
+    hasMore: Boolean!
+}
+
+type CompanyReview {
+    id: Float!
+    createdAt: String!
+    updatedAt: String!
+    title: String!
+    text: String!
+    company: Company!
+    stars: Float!
+    companyId: Int!
+}
+
+input CreateJobInput {
+    title: String!
+    description: String
+    employmentType: String
+    salary: [Int!]
+    applicationDeadline: String
+    experience: Int
+    companyId: Int!
+}
+
+input CreateWorkExpInput {
+    jobTitle: String!
+    company: String!
+    from: String
+    to: String
+}
+
+input CreateWorkSkillInput {
+    skill: String!
+    yearOfExperience: Float
+}
+
+type DeleteJobResponse {
+    deletedId: Int
+}
+
+type ErrorField {
+    field: String!
+    message: String!
+}
+
+type Job {
+    id: Float!
+    createdAt: String!
+    updatedAt: String!
+    title: String!
+    company: Company!
+    companyId: Int!
+    description: String!
+    employmentType: String!
+    salary: String!
+    applicationDeadline: String
+    experience: Int
+    viewCount: Int
+}
+
+type JobResponse {
+    items: [Job!]!
+    total: Int!
+    hasMore: Boolean!
+}
+
+type Mutation {
+    changePassword(newPassword: String!, token: String!): UserResponse!
+    register(options: RegisterInput!): UserResponse!
+    login(password: String!, usernameOrEmail: String!): UserResponse!
+    logout: Boolean!
+    forgotPassword(email: String!): Boolean!
+    saveJob(jobId: Float!): Boolean!
+    notInterestedJob(jobId: Float!): Boolean!
+    vote(value: Int!, postId: Int!): VoteResult
+    createPost(input: PostInput!): Post!
+    updatePost(text: String!, title: String!, id: Int!): Post
+    deletePost(id: Int!): Int
+    createJob(createJobInput: CreateJobInput!): Job!
+    updateJob(updateJobInput: UpdateJobInput!): Job!
+    reportJob(jobId: Int!): ReportJobResponse
+    deleteJob(id: Int!): DeleteJobResponse!
+    createWorkExperience(workExperience: CreateWorkExpInput!): WorkExperience!
+    updateWorkExperience(workExperience: UpdateWorkExpInput!): WorkExperience!
+    deleteWorkExperience(id: Float!): Int!
+    createCompany(company: CompanyInput!): Company!
+    createWorkSkill(workSkill: CreateWorkSkillInput!): WorkSkill!
+    updateWorkSkill(workSkill: CreateWorkSkillInput!): WorkSkill!
+    deleteWorkSKill(id: Float!): Int!
+}
+
+type PaginatedPosts {
+    posts: [Post!]!
+    hasMore: Boolean!
+}
+
+type Post {
+    id: Float!
+    createdAt: String!
+    updatedAt: String!
+    title: String!
+    voteStatus: Int
+    creatorId: Float!
+    text: String!
+    points: Float!
+    creator: User!
+}
+
+input PostInput {
+    title: String!
+    text: String!
+}
+
+type ProfileResponse {
+    workExperiences: [WorkExperience!]
+    workSkills: [WorkSkill!]
+}
+
+type Query {
+    hello: String!
+    currentUser: User
+    profile: ProfileResponse
+    posts(skip: Int, top: Int): PaginatedPosts!
+    post(id: Int!): Post
+    jobs: JobResponse
+    hottestJob: JobResponse!
+    newestJob: JobResponse!
+    relatedJobs(
+        jobCategory: String!
+        companyId: Int!
+        currentJobId: Int!
+    ): JobResponse!
+    job(id: Int!): Job
+    companies: CompanyResponse!
+}
+
+input RegisterInput {
+    username: String!
+    password: String!
+    email: String!
+}
+
+type ReportJobResponse {
+    jobToReplace: Job!
+    reportedJobId: Int!
+}
+
+input UpdateJobInput {
+    title: String!
+    description: String
+    employmentType: String
+    salary: [Int!]
+    applicationDeadline: String
+    experience: Int
+    id: Int!
+}
+
+input UpdateWorkExpInput {
+    jobTitle: String!
+    company: String!
+    from: String
+    to: String
+    id: Float!
+}
+
+type User {
+    id: Float!
+    createdAt: String!
+    updatedAt: String!
+    username: String!
+    email: String!
+    workExperiences: [WorkExperience!]!
+    workSkills: [WorkSkill!]!
+}
+
+type UserResponse {
+    errors: [ErrorField!]
+    user: User
+}
+
+type VoteResult {
+    value: Int
+    postId: Int!
+}
+
+type WorkExperience {
+    id: Float!
+    createdAt: String!
+    updatedAt: String!
+    jobTitle: String!
+    company: String!
+    from: String
+    to: String
+    user: User!
+    userId: Int!
+}
+
+type WorkSkill {
+    id: Float!
+    createdAt: String!
+    updatedAt: String!
+    skill: String!
+    yearOfExperience: Float
+    user: User!
+    userId: Int!
+}
+
