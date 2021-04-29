@@ -1,6 +1,6 @@
 import WorkExpForm from "./WorkExpForm";
 import ProfileSection from "./ProfileSection";
 import WorkSkillForm from "./WorkSkillForm";
-import WorkExpItem from "./WorkExpItem";
+import Item from "./Item";
 
-export { WorkExpForm, ProfileSection, WorkSkillForm, WorkExpItem }
+export { WorkExpForm, ProfileSection, WorkSkillForm, Item }

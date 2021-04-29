@@ -1,6 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
 import { ERROR_FRAGMENT } from "../fragments";
-import { User } from "../../types";
+import { FieldErrors, User } from "../../types";
 
 const REGISTER_MUTATION = gql`
     ${ERROR_FRAGMENT}
@@ -19,7 +19,8 @@ const REGISTER_MUTATION = gql`
 
 type Response = {
     register: {
-        user: User
+        user: User,
+        errors: FieldErrors
     }
 }
 

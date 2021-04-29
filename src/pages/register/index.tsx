@@ -1,7 +1,7 @@
 import React from 'react'
 import { Field, Form, Formik, FormikErrors, FormikHelpers } from 'formik'
 import { Button } from '@chakra-ui/react'
-import { mapErrors } from "../../utils";
+import { mapGqlErrorsToFormikErrors } from "../../utils";
 import { useRouter } from "next/router";
 import { useRegisterMutation } from "../../graphql";
 import withApollo from "../../withApollo";
@@ -10,6 +10,7 @@ import { FormikInput } from "../../components/formik-fields";
 import FormContainer from "../../components/shared/FormContainer";
 import PageContainer from "../../components/shared/PageContainer";
 import Link from "next/link";
+import { useBlueColorModeValue } from "../../hooks";
 
 type RegisterForm = {
     username: string
@@ -44,9 +45,9 @@ function Register() {
         formikHelper: FormikHelpers<RegisterForm>
     ) {
         const res = await register( { variables: inputValues } )
-        const { errors, user } = res.data.register
+        const { errors, user } = res.data?.register || {}
         if( errors ) {
-            formikHelper.setErrors( mapErrors( errors ) || {} )
+            formikHelper.setErrors( mapGqlErrorsToFormikErrors( errors ) || {} )
             return
         }
         if( user ) {
@@ -82,7 +83,7 @@ function Register() {
                         <Button colorScheme={ "blue" } w={ "100%" } mt={ 8 } mb={ 6 } type={ "submit" }>
                             Register
                         </Button>
-                        <Heading size={ "md" } my={ 4 } textAlign={ "center" } color={ "blue.500" }>
+                        <Heading size={ "md" } my={ 4 } textAlign={ "center" } color={ useBlueColorModeValue() }>
                             <Link href={ "/login" }>
                                 Already have account? Login
                             </Link>

@@ -9,17 +9,20 @@ import {
 } from "@chakra-ui/react"
 import { useDisclosure } from "@chakra-ui/hooks";
 import React, { Ref } from "react";
-import LoginForm from "./LoginForm";
 import { useRouteChangeListener } from "../../hooks";
+import { Button } from "@chakra-ui/button";
+import Link from 'next/link'
+import { useRouter } from "next/router";
 
 type RequireAuthModalRef = {
-    requireAuthForAction( action: string ): void
+    requireAuthForAction( action: string | undefined ): void
 }
 
 function RequireAuthModal( {}, ref: Ref<RequireAuthModalRef> ) {
 
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [ action, setAction ] = React.useState<string>()
+    const router = useRouter()
 
     React.useImperativeHandle( ref, () => ( {
         requireAuthForAction: function( _action ) {
@@ -45,9 +48,19 @@ function RequireAuthModal( {}, ref: Ref<RequireAuthModalRef> ) {
                 </ModalHeader>
                 <ModalCloseButton/>
                 <ModalBody>
-                    <LoginForm onSuccess={ onClose }/>
+                    You need login to { action || "perform this action" }
                 </ModalBody>
                 <ModalFooter>
+                    <Button colorScheme={ "blue" } mr={ 8 }>
+                        <Link href={ `/register?redirect=${ router.route }` }>
+                            Register
+                        </Link>
+                    </Button>
+                    <Button colorScheme={ "blue" }>
+                        <Link href={ `/login?redirect=${ router.route }` }>
+                            Login
+                        </Link>
+                    </Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>

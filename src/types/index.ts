@@ -11,9 +11,9 @@ enum EmploymentType {
 }
 
 export enum JobMenuEnum {
-    SAVE = "Save job",
-    REPORT = "Report Job",
-    NOT_INTERESTED = "Not interested"
+    SAVE,
+    REPORT,
+    NOT_INTERESTED
 }
 
 export enum CRUDActions {
@@ -27,7 +27,7 @@ export type PaginatedResponse<T> = {
     hasMore: boolean
 }
 
-type BaseEntity = {
+export type BaseEntity = {
     id: number
     createdAt?: string
     //gql prop
@@ -40,7 +40,9 @@ export type Job = {
     salary: string
     title: string
     description: string
-    applicationDeadline: string
+    applicationDeadline: string,
+    requirements: string,
+    hasBeenSaved: boolean
 } & BaseEntity
 
 export type User = {
@@ -49,9 +51,10 @@ export type User = {
     id: string
 }
 
-export type JobResponse = PaginatedResponse<Job>
-
-export type FieldErrors = { field: string, message: string }[] & GraphQLError[]
+export type FieldErrors = {
+    field: string,
+    message: string
+}[] & GraphQLError[]
 
 export type Company = {
     name: string
@@ -77,7 +80,13 @@ export type WorkExperience = {
 export type WorkSkill = {
     skill: string
     yearOfExperience?: number
+    userId: number
 } & BaseEntity
+
+export type HottestCategory = {
+    title: string
+    numberOfJobs: string
+}
 
 export type Profile = {
     workExperiences: WorkExperience[]

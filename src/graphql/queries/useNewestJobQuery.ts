@@ -1,18 +1,18 @@
 import { gql, useQuery } from "@apollo/client";
 import { Job } from "../../types";
-import { JOB_SECTION_LIST_RESPONSE_FRAGMENT } from "../fragments";
+import { JOB_FRAGMENT } from "../fragments";
 
 const GET_NEWEST_JOB_QUERY = gql`
-    ${JOB_SECTION_LIST_RESPONSE_FRAGMENT}
-    query GetAllHottestJobs {
+    ${JOB_FRAGMENT}
+    query GetAllNewestJobs {
         newestJob {
-            ...JobSectionListResponseFragment
+            ...JobFragment
         }
     }
 `
 
 type JobData = {
-    newestJob: { items: Job[] }
+    newestJob: Job[]
 }
 
 const useNewestJobQuery = () => useQuery<JobData, any>( GET_NEWEST_JOB_QUERY )

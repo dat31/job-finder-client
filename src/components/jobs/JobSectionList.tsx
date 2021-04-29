@@ -11,7 +11,7 @@ type Props = {
     loading: QueryResult["loading"],
     error: QueryResult["error"],
     section: string
-    handleJobMenuClick( clickedMenu: JobMenuEnum ): void
+    onJobMenuClick( clickedMenu: JobMenuEnum, job: Job ): void
 }
 
 function JobSectionList( {
@@ -19,7 +19,7 @@ function JobSectionList( {
                              jobs,
                              loading,
                              section,
-                             handleJobMenuClick
+                             onJobMenuClick
                          }: Props ) {
 
     const itemBgColor = useColorModeValue( "white", "black" )
@@ -41,6 +41,9 @@ function JobSectionList( {
         if( error ) {
             return "SOME THING WENT WRONG!"
         }
+        if( jobs?.length === 0 ) {
+            return `There is no ${ section }`
+        }
         if( !jobs ) {
             return
         }
@@ -48,7 +51,7 @@ function JobSectionList( {
             <JobItem
                 key={ job.id }
                 job={ job }
-                onMenuClick={ handleJobMenuClick } />
+                onMenuClick={ onJobMenuClick }/>
         ) )
     }
 

@@ -4,9 +4,9 @@ import { User } from "../../types";
 const GET_CURRENT_USER_GQL = gql`
     query CurrentUser {
         currentUser {
-            id
             username,
-            email,
+            savedJobIds,
+            reportedJobIds,
         }
     }
 `
@@ -16,6 +16,7 @@ type Response = {
 }
 
 const useCurrentUserQuery = () => useQuery<Response>( GET_CURRENT_USER_GQL, {
-    skip: typeof window === 'undefined'
+    skip: typeof window === 'undefined',
+    fetchPolicy: "network-only"
 } )
 export default useCurrentUserQuery

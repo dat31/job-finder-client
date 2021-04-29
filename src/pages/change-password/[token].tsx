@@ -1,7 +1,7 @@
 import { Alert, AlertIcon, Box, Button, Link } from '@chakra-ui/react';
 import React, { useState } from "react";
 import { useChangePasswordMutation } from "../../graphql/mutations";
-import { mapErrors } from "../../utils";
+import { mapGqlErrorsToFormikErrors } from "../../utils";
 import { useRouter } from "next/router";
 import { Field, Form, Formik, FormikErrors, FormikHelpers } from "formik";
 import { FormikInput } from "../../components/formik-fields";
@@ -15,7 +15,7 @@ type ChangePasswordForm = {
     confirmNewPassword: string
 }
 
-const validate = ( { newPassword, confirmNewPassword }: ChangePasswordForm ) => {
+function validate( { newPassword, confirmNewPassword }: ChangePasswordForm ): FormikErrors<ChangePasswordForm> {
     const errors: FormikErrors<ChangePasswordForm> = {}
     if( !newPassword ) {
         errors.newPassword = 'New password is required!'
@@ -57,7 +57,7 @@ function ChangePassword() {
             return setTokenError( tokenEr.message )
         }
         if( errors ) {
-            return setErrors( mapErrors( errors ) || {} )
+            return setErrors( mapGqlErrorsToFormikErrors( errors ) || {} )
         }
         return router.push( '/' )
     }

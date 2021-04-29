@@ -19,17 +19,14 @@ import {
     AlertTitle,
     AlertDescription,
 } from "@chakra-ui/react"
+import { useReportJobMutation } from "../../graphql";
+import { Job } from "../../types";
 
 export type ReportJobModalRef = {
-    onOpen(): void
-    onClose(): void
-    onLoading(): void
-    onSuccess(): void
+    open( jobId: Job["id"] ): void
 }
 
-type Props = {
-    onSubmit(): void,
-}
+type Props = {}
 
 const reasonCheckBoxes = [
     "It is offensive, discriminatory",
@@ -42,35 +39,37 @@ const reasonCheckBoxes = [
 const VALID_REPORT_ADDITIONAL_INFO_LENGTH = 20
 
 function ReportJobModal(
-    { onSubmit }: Props,
+    {}: Props,
     ref: Ref<ReportJobModalRef>
 ) {
 
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [ additionalInformation, setAdditionalInformation ] = React.useState<string>( "" )
     const [ reportReasons, setReportReasons ] = React.useState<string[]>( [] )
-    const [ { isLoading = false, isSuccess = false } = {}, setCallAPIState ] =
-        React.useState<{ isLoading?: boolean, isSuccess?: boolean } | undefined>()
+    const [ jobId, setJobId ] = React.useState<number | undefined>()
+    const [ reportJob, { loading } ] = useReportJobMutation(  )
+    const [ isSuccess, setIsSuccess ] = React.useState<boolean>( false )
 
     React.useImperativeHandle( ref, () => ( {
-        onOpen,
-        onClose,
-        onLoading: function() {
-            setCallAPIState( { isLoading: true } )
+        open( id: Job["id"] ) {
+            setJobId( id )
         },
-        onSuccess: function() {
-            console.log( "ON SUCCESS CALLED" )
-            setCallAPIState( { isSuccess: true, isLoading: false } )
-        }
+        onClose,
     } ), [] )
 
     React.useEffect( () => {
         return function() {
             setAdditionalInformation( "" )
             setReportReasons( [] )
-            setCallAPIState( undefined )
+            setIsSuccess( false )
         }
     }, [ isOpen ] )
+
+    React.useEffect( () => {
+        if( jobId ) {
+            onOpen()
+        }
+    }, [ jobId, onOpen ] )
 
     function handleAdditionalInfoChange( evt: React.ChangeEvent<HTMLTextAreaElement> ): void {
         setAdditionalInformation( evt.target.value )
@@ -86,6 +85,17 @@ function ReportJobModal(
             }
             return prevState.filter( r => r !== name )
         } )
+    }
+
+    function onSubmit() {
+        reportJob( { variables: { jobId } } )
+            .then( ( { data } ) => {
+                if( !data ) {
+                    return
+                }
+                setIsSuccess( true )
+                setJobId( undefined )
+            } )
     }
 
     const enableSubmit = (
@@ -155,8 +165,8 @@ function ReportJobModal(
                             ? null
                             : <Button
                                 colorScheme="blue"
-                                disabled={ !enableSubmit || isLoading || isSuccess }
-                                onClick={ () => onSubmit() }>
+                                disabled={ !enableSubmit || loading || isSuccess }
+                                onClick={ onSubmit }>
                                 Submit
                             </Button>
                     }

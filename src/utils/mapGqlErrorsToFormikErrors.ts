@@ -1,6 +1,6 @@
 import { FieldErrors } from "../types";
 
-function mapErrors( errors: FieldErrors | undefined ) {
+function mapGqlErrorsToFormikErrors( errors: FieldErrors | undefined ) {
     if( !errors ) {
         return undefined
     }
@@ -10,4 +10,4 @@ function mapErrors( errors: FieldErrors | undefined ) {
     } ), {} )
 }
 
-export default mapErrors
+export default mapGqlErrorsToFormikErrors

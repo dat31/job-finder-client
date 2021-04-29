@@ -1,17 +1,20 @@
 import { Box, Heading } from "@chakra-ui/layout";
 import { useColorModeValue } from "@chakra-ui/color-mode";
-import { HStack, Input, InputGroup, InputLeftElement } from "@chakra-ui/react";
+import { Input, InputGroup, InputLeftElement, Flex } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
-import { LocationIcon } from "../icons";
-import { Button } from "@chakra-ui/button";
 import React, { ChangeEvent } from "react";
 
 type FilterCondition = {
     keyword?: string
-    location?: string
 }
 
-function JobFilter() {
+type Props = {
+    title: string
+    subtitle: string
+    inputPlaceholder: string
+}
+
+function Filter( { title, subtitle, inputPlaceholder }: Props ) {
 
     const [ , setFilterCondition ] = React.useState<FilterCondition>( {} )
 
@@ -25,14 +28,15 @@ function JobFilter() {
 
     return (
         <Box
+            w={ "100%" }
             bgColor={ useColorModeValue( "white", "black" ) }
-            px={ 16 }
+            pl={ 16 }
             py={ 24 }>
             <Heading mb={ 2 } color={ useColorModeValue( "blue.500", "blue.200" ) }>
-                Find your dream jobs
+                { title }
             </Heading>
-            <Heading mb={ 6 } size={ "md" }>Explore 1000+ jobs on FINDER</Heading>
-            <HStack spacing={ 8 }>
+            <Heading mb={ 6 } size={ "md" }>{ subtitle }</Heading>
+            <Flex justifyContent={ "center" } alignItems={ "center" }>
                 <InputGroup>
                     <InputLeftElement
                         onChange={ handleFilterChange }
@@ -41,26 +45,12 @@ function JobFilter() {
                     />
                     <Input
                         variant={ "filled" }
-                        placeholder="Job title, keywords"/>
+                        placeholder={ inputPlaceholder }/>
                 </InputGroup>
-                <InputGroup>
-                    <InputLeftElement
-                        onChange={ handleFilterChange }
-
-                        pointerEvents="none"
-                        children={ <LocationIcon color="gray.300"/> }
-                    />
-                    <Input
-                        variant={ "filled" }
-                        placeholder="City or province"/>
-                </InputGroup>
-                <Button colorScheme={ "blue" } px={ 12 } leftIcon={ <SearchIcon/> } flexGrow={ 1 }>
-                    Find job
-                </Button>
-            </HStack>
+            </Flex>
         </Box>
     )
 
 }
 
-export default JobFilter
+export default Filter

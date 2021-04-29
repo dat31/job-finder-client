@@ -1,7 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
 import { ERROR_FRAGMENT } from "../fragments";
 import { FieldErrors, User } from "../../types";
-import { apolloClient } from "../../withApollo";
 
 const REGISTER_MUTATION = gql`
     ${ERROR_FRAGMENT}
@@ -10,7 +9,7 @@ const REGISTER_MUTATION = gql`
             user {
                 username,
                 id,
-                email,
+                email
             }
             errors {
                 ...ErrorFragment,
@@ -27,7 +26,6 @@ type LoginResponse = {
 }
 
 const useLoginMutation = () => useMutation<LoginResponse>( REGISTER_MUTATION, {
-    client: apolloClient,
     update( cache, { data } ) {
         if( data?.login.errors ) {
             return

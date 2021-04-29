@@ -1,31 +1,33 @@
 import { Job, JobMenuEnum } from "../../types";
 import React from "react";
 import { Box, Flex, GridItem, Heading, Text } from "@chakra-ui/layout";
-import { useColorModeValue } from "@chakra-ui/color-mode";
 import Link from 'next/link'
 import { useRouter } from "next/router";
 import JobItemMenu from "./JobItemMenu";
+import { useColorModeValue } from "@chakra-ui/color-mode";
 
 type JobItemProps = {
     job: Job
-    onMenuClick( menu: JobMenuEnum ): void
+    onMenuClick( clickedMenu: JobMenuEnum, job: Job ): void
 }
 
 function JobItem( { job, onMenuClick }: JobItemProps ) {
-    const { title, id, description, company, salary } = job
-    const bgColor = useColorModeValue( "white", "black" )
+
+    const { title, id, description, company, salary, hasBeenSaved } = job
     const router = useRouter()
+
     if( !id ) {
         return null
     }
 
     return (
         <GridItem
+            p={ 6 }
             cursor={ "pointer" }
             id={ id.toString() }
             overflow={ "hidden" }
-            bgColor={ bgColor }>
-            <Box p={ 6 }>
+            bgColor={ useColorModeValue( "gray.100", "black" ) }>
+            <Box>
                 <Flex
                     justifyContent={ "space-between" }
                     alignItems={ "center" }>
@@ -42,7 +44,10 @@ function JobItem( { job, onMenuClick }: JobItemProps ) {
                             </Heading>
                         </Box>
                     </Link>
-                    <JobItemMenu onClick={ onMenuClick } jobId={ id }/>
+                    <JobItemMenu
+                        hasBeenSaved={ hasBeenSaved }
+                        onClick={ clickedMenu => onMenuClick( clickedMenu, job ) }
+                        jobId={ id }/>
                 </Flex>
                 <Link
                     as={ `/jobs/${ id }` }

@@ -1,18 +1,5 @@
 import { gql } from "@apollo/client";
 
-export const PostFragment = gql`
-    fragment PostFragment on Post {
-        voteStatus
-        id
-        title
-        text
-        points
-        creator {
-            username
-        }
-    }
-`
-
 export const ERROR_FRAGMENT = gql`
     fragment ErrorFragment on ErrorField {
         message
@@ -30,15 +17,9 @@ export const JOB_FRAGMENT = gql`
         salary
         title
         description
-    }
-`
-
-export const JOB_SECTION_LIST_RESPONSE_FRAGMENT = gql`
-    ${JOB_FRAGMENT}
-    fragment JobSectionListResponseFragment on JobResponse {
-        items {
-            ...JobFragment
-        }
+        requirements
+        hasBeenSaved
+        hasBeenReported
     }
 `
 

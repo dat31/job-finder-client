@@ -18,7 +18,7 @@ type Response = {
 }
 
 type Variables = {
-    workExperience: WorkExperience
+    workExperience: Omit<WorkExperience, "userId" | "__typename">
 }
 
 const useUpdateWorkExperienceMutation = () => useMutation<Response, Variables>( EDIT_WORK_EXP_GQL, {

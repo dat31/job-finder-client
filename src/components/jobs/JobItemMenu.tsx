@@ -1,39 +1,25 @@
 import { Job, JobMenuEnum } from "../../types";
 import React, { ReactElement } from "react";
-import { BookMarkIcon, CloseIcon, FlagIcon } from "../icons";
+import { BookMarkIcon, FlagIcon } from "../icons";
 import { IconButton, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
-import { HamburgerIcon } from "@chakra-ui/icons";
+import { HamburgerIcon, NotAllowedIcon } from "@chakra-ui/icons";
 
 type JobMenuProps = {
-    onClick( menu: JobMenuEnum, jobId: Job["id"] ): void
+    onClick( menu: JobMenuEnum ): void
     jobId: Job["id"]
+    hasBeenSaved: boolean
 }
 
-function getMenuIcon( jobMenuItem: JobMenuEnum ): ReactElement | undefined {
-    switch( jobMenuItem ) {
-        case JobMenuEnum.REPORT: {
-            return <FlagIcon/>
-        }
-        case JobMenuEnum.SAVE: {
-            return <BookMarkIcon/>
-        }
-        case JobMenuEnum.NOT_INTERESTED: {
-            return <CloseIcon/>
-        }
-        default:
-            return undefined
-    }
+function getJobMenu( hasBeenSaved: boolean ): { value: JobMenuEnum, label: string, icon: ReactElement }[] {
+    return [
+        { value: JobMenuEnum.SAVE, label: hasBeenSaved ? "Remove saved job" : "Save job", icon: <BookMarkIcon/> },
+        { value: JobMenuEnum.REPORT, label: "Report job", icon: <FlagIcon/> },
+        { value: JobMenuEnum.NOT_INTERESTED, label: "Not interest", icon: <NotAllowedIcon/> }
+    ]
 }
 
-const jobMenus = Object
-    .entries( JobMenuEnum )
-    .map( ( [ value, label ] ) => ( {
-        label,
-        value,
-        icon: getMenuIcon( label )
-    } ) )
 
-function JobItemMenu( { onClick, jobId }: JobMenuProps ) {
+function JobItemMenu( { onClick, hasBeenSaved }: JobMenuProps ) {
     return (
         <Menu isLazy={ true }>
             <MenuButton
@@ -42,12 +28,12 @@ function JobItemMenu( { onClick, jobId }: JobMenuProps ) {
                 <HamburgerIcon/>
             </MenuButton>
             <MenuList>
-                { jobMenus.map( ( { label, value, icon } ) => (
+                { getJobMenu( hasBeenSaved ).map( ( { label, value, icon } ) => (
                     <MenuItem
                         iconSpacing={ 6 }
                         icon={ icon }
                         key={ value }
-                        onClick={ () => onClick( label, jobId ) }
+                        onClick={ () => onClick( value ) }
                         children={ label }
                     />
                 ) ) }

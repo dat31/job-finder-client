@@ -1,18 +1,18 @@
 import { gql, useLazyQuery } from "@apollo/client";
-import { JOB_SECTION_LIST_RESPONSE_FRAGMENT } from "../fragments";
+import { JOB_FRAGMENT } from "../fragments";
 import { Job } from "../../types";
 
 const RELATED_JOB_QUERY = gql`
-    ${JOB_SECTION_LIST_RESPONSE_FRAGMENT}
+    ${JOB_FRAGMENT}
     query GetRelatedJobs( $jobCategory:String!, $companyId:Int!, $currentJobId: Int! ) {
         relatedJobs( companyId: $companyId, jobCategory: $jobCategory, currentJobId: $currentJobId ) {
-            ...JobSectionListResponseFragment
+            ...JobFragment
         }
     }
 `
 
 type Response = {
-    relatedJobs: { items: Job[] }
+    relatedJobs: Job[]
 }
 
 type Variables = {
@@ -20,7 +20,6 @@ type Variables = {
     companyId: number
     currentJobId: number
 }
-
 
 const useRelatedJobQuery = () => useLazyQuery<Response, Variables>( RELATED_JOB_QUERY )
 

@@ -3,11 +3,11 @@ import { ReportJobModal } from "../jobs";
 import React, { FunctionComponent, Ref } from "react";
 import { ReportJobModalRef } from "../jobs/ReportJobModal";
 import { NextPageContext } from "next";
-import { useReportJobMutation } from "../../graphql";
-import { useRouter } from "next/router";
+import { useSaveJobMutation } from "../../graphql";
+import { useToast } from "@chakra-ui/react";
 
 export interface WithJobMenuHandlerProps {
-    handleJobMenuClick( clickedMenu: JobMenuEnum ): void
+    handleJobMenuClick( clickedMenu: JobMenuEnum, job: Job ): void
 }
 
 function withJobMenuHandler<P extends WithJobMenuHandlerProps>(
@@ -17,43 +17,29 @@ function withJobMenuHandler<P extends WithJobMenuHandlerProps>(
     return function( props: P ) {
 
         const reportJobModalRef = React.useRef<ReportJobModalRef>()
-        const [ reportJob ] = useReportJobMutation()
-        const router = useRouter()
-        const activeJobId = React.useRef<number | undefined>()
+        const [ saveJob ] = useSaveJobMutation()
+        const toast = useToast()
 
-        //TODO: REFACTOR PASS FN TO REPORTJOBMODAL
-        function handleReportJobFormSubmit() {
-            const jobIdToReport = activeJobId.current
-            if( !jobIdToReport ) {
+        function handleJobMenuClick( clickedMenu: JobMenuEnum, job: Job ) {
+            if( !job.id ) {
                 return
             }
-            reportJobModalRef.current?.onLoading()
-            reportJob( { variables: { jobId: jobIdToReport } } )
-                .then( function( { errors } ) {
-                    if( errors ) {
-                        //TODO: DISPLAY ERROR
-                        return;
-                    }
-                    if( parseInt( router.query.jobId as string ) === jobIdToReport ) {
-                        //TODO: REPLACE
-                    }
-                    activeJobId.current = undefined
-                    reportJobModalRef.current?.onSuccess()
-                } )
-        }
-
-        function handleJobMenuClick( clickedMenu: JobMenuEnum, jobId: Job["id"] ) {
             switch( clickedMenu ) {
                 case JobMenuEnum.REPORT: {
-                    reportJobModalRef.current?.onOpen()
-                    activeJobId.current = jobId
+                    reportJobModalRef.current?.open( job.id )
                     break
                 }
                 case JobMenuEnum.NOT_INTERESTED: {
                     break
                 }
                 case JobMenuEnum.SAVE: {
-                    break
+                    saveJob( { variables: { jobId: job.id } } )
+                        .then( () => toast( {
+                            status: "success",
+                            title: `Job has been ${ job.hasBeenSaved ? `removed` : `saved` }`,
+                            isClosable: true
+                        } ) )
+                    break;
                 }
                 default:
                     break
@@ -62,9 +48,7 @@ function withJobMenuHandler<P extends WithJobMenuHandlerProps>(
 
         return (
             <>
-                <ReportJobModal
-                    onSubmit={ handleReportJobFormSubmit }
-                    ref={ reportJobModalRef as Ref<ReportJobModalRef> | undefined }/>
+                <ReportJobModal ref={ reportJobModalRef as Ref<ReportJobModalRef> | undefined }/>
                 {/*@ts-ignore*/ }
                 <WrappedComponent
                     { ...props as P }

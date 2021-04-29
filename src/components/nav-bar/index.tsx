@@ -61,7 +61,9 @@ function NavBar() {
                         ml={ 2 }
                         children={ data?.currentUser.username }/>
                     <MenuList>
-                        <MenuItem>My Jobs</MenuItem>
+                        <MenuItem onClick={ () => router.push( "/my-jobs" ) }>
+                            My Jobs
+                        </MenuItem>
                         <MenuItem>My Reviews</MenuItem>
                         <MenuItem onClick={ () => router.push( "/profile" ) }>Profile</MenuItem>
                         <MenuDivider/>

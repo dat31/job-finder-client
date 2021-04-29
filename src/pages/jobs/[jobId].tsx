@@ -1,16 +1,15 @@
 import { useRouter } from "next/router";
 import withApollo from "../../withApollo";
 import PageContainer from "../../components/shared/PageContainer";
-import JobFilter from "../../components/shared/JobFilter";
-import { useJobLazyQuery, useRelatedJobLazyQuery } from "../../graphql";
+import { useJobLazyQuery, useRelatedJobLazyQuery, useSaveJobMutation } from "../../graphql";
 import React from "react";
 import { Box, Flex, Heading, Text } from "@chakra-ui/layout";
 import { Button } from "@chakra-ui/button";
 import { JobSectionList } from "../../components/jobs";
 import { FlagIcon, NavigateIcon } from "../../components/icons";
 import withJobMenuHandler, { WithJobMenuHandlerProps } from "../../components/shared/withJobMenuHandler";
-import { JobMenuEnum } from "../../types";
-import { useBgColorModeValue } from "../../hooks";
+import { Job, JobMenuEnum } from "../../types";
+import { DownloadIcon } from "@chakra-ui/icons";
 
 type JobDetailSectionProps = {
     title: string
@@ -23,7 +22,7 @@ function JobDetailSection( { title, content }: JobDetailSectionProps ) {
             <Heading size={ "md" } mb={ 2 }>
                 { title }
             </Heading>
-            <Text mb={ 4 }>{ content }</Text>
+            <Text mb={ 8 }>{ content }</Text>
         </>
     )
 }
@@ -34,11 +33,14 @@ function JobDetail( { handleJobMenuClick }: WithJobMenuHandlerProps ) {
     const { jobId } = router.query
     const [ getJobDetail, { data: jobDetail } ] = useJobLazyQuery()
     const [ getRelatedJobs, { data: relatedJobs, loading, error } ] = useRelatedJobLazyQuery()
+    const [ , { loading: isLoadingSaveJob } ] = useSaveJobMutation()
+
     const {
         title,
         description,
         company: { name: companyName = "" } = {},
         salary,
+        requirements
     } = jobDetail?.job || {}
 
     React.useEffect( () => {
@@ -56,11 +58,9 @@ function JobDetail( { handleJobMenuClick }: WithJobMenuHandlerProps ) {
         getRelatedJobs( { variables: { jobCategory, companyId, currentJobId } } )
     }, [ jobDetail, getRelatedJobs ] )
 
-
     return (
         <PageContainer>
-            <JobFilter/>
-            <Box p={ 8 } mx={ 16 } mt={ 16 } mb={ 8 } bgColor={ useBgColorModeValue() }>
+            <Box m={ 16 }>
                 <Flex justifyContent={ "space-between" }>
                     <Heading size={ "lg" } mb={ 2 }>
                         { title }
@@ -70,28 +70,35 @@ function JobDetail( { handleJobMenuClick }: WithJobMenuHandlerProps ) {
                 <Text>
                     { companyName }
                 </Text>
-                <Text mb={ 4 }>
+                <Text mb={ 8 }>
                     Application deadline: 12/12/2012
                 </Text>
                 <JobDetailSection title={ "Salary" } content={ salary }/>
                 <JobDetailSection title={ "Description" } content={ description }/>
-                <JobDetailSection title={ "Requirements" } content={ description }/>
+                <JobDetailSection title={ "Requirements" } content={ requirements }/>
                 <Flex>
+                    <Button
+                        isLoading={ isLoadingSaveJob }
+                        leftIcon={ <DownloadIcon color={ "white" }/> }
+                        mr={ 4 }
+                        colorScheme={ "blue" }>
+                        Save this job
+                    </Button>
                     <Button leftIcon={ <NavigateIcon color={ "white" }/> } mr={ 4 } colorScheme={ "blue" }>
                         Apply this job
                     </Button>
                     <Button
-                        onClick={ () => handleJobMenuClick( "Report Job" as JobMenuEnum ) }
+                        onClick={ () => handleJobMenuClick( JobMenuEnum.REPORT, jobDetail?.job as Job ) }
                         leftIcon={ <FlagIcon/> }>Report this job</Button>
                 </Flex>
             </Box>
             <Box mx={ 16 }>
                 <JobSectionList
-                    jobs={ relatedJobs?.relatedJobs?.items }
+                    jobs={ relatedJobs?.relatedJobs }
                     loading={ loading }
                     error={ error }
                     section={ "Related jobs" }
-                    handleJobMenuClick={ handleJobMenuClick }
+                    onJobMenuClick={ handleJobMenuClick }
                 />
             </Box>
         </PageContainer>
